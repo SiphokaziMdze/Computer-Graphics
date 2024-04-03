@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotating Cube with Rotation Buttons</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            width: 400px;
+            height: 400px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <button onclick="rotateX()">Rotate X</button>
+    <button onclick="rotateY()">Rotate Y</button>
+    <button onclick="rotateZ()">Rotate Z</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+    <script>
+        var gl;
+        var shaderProgram;
+        var vertices;
+        var vertexBuffer;
+        var colorBuffer;
+        var angleX = 0;
+        var angleY = 0;
+        var angleZ = 0;
+
+        window.onload = function() {
+            var canvas = document.getElementById('myCanvas');
+            gl = canvas.getContext('webgl');
+
+            if (!gl) {
+                console.log('WebGL not supported, falling back on experimental-webgl');
+                gl = canvas.getContext('experimental-webgl');
+            }
+
+            if (!gl) {
+                alert('Your browser does not support WebGL');
+                return;
+            }
+
+            // Define vertices for a cube
+            vertices = [
+                // Front face
+                -0.5, -0.5,  0.5,
+                 0.5, -0.5,  0.5,
+                 0.5,  0.5,  0.5,
+                -0.5,  0.5,  0.5,
+
+                // Back face
+                -0.5, -0.5, -0.5,
+                -0.5,  0.5, -0.5,
+                 0.5,  0.5, -0.5,
+                 0.5, -0.5, -0.5,
+
+                // Top face
+                -0.5,  0.5, -0.5,
+                -0.5,  0.5,  0.5,
+                 0.5,  0.5,  0.5,
+                 0.5,  0.5, -0.5,
+
+                // Bottom face
+                -0.5, -0.5, -0.5,
+                 0.5, -0.5, -0.5,
+                 0.5, -0.5,  0.5,
+                -0.5, -0.5,  0.5,
+
+                // Right face
+                 0.5, -0.5, -0.5,
+                 0.5,  0.5, -0.5,
+                 0.5,  0.5,  0.5,
+                 0.5, -0.5,  0.5,
+
+                // Left face
+                -0.5, -0.5, -0.5,
+                -0.5, -0.5,  0.5,
+                -0.5,  0.5,  0.5,
+                -0.5,  0.5, -0.5,
+            ];
+
+            // Define colors for each face of the cube
+            var colors = [
+                [1.0, 0.0, 0.0, 1.0],    // Front face: red
+                [0.0, 1.0, 0.0, 1.0],    // Back face: green
+                [0.0, 0.0, 1.0, 1.0],    // Top face: blue
+                [1.0, 1.0, 0.0, 1.0],    // Bottom face: yellow
+                [1.0, 0.0, 1.0, 1.0],    // Right face: magenta
+                [0.0, 1.0, 1.0, 1.0]     // Left face: cyan
+            ];
+
+            var unpackedColors = [];
+            for (var i in colors) {
+                var color = colors[i];
+                for (var j=0; j < 4; j++) {
+                    unpackedColors = unpackedColors.concat(color);
+                }
+            }
+
+            // Create buffer for vertices
+            vertexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+            // Create buffer for colors
+            colorBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(unpackedColors), gl.STATIC_DRAW);
+
+            // Create vertex shader
+            var vertCode = `
+                attribute vec3 coordinates;
+                attribute vec4 color;
+                uniform mat4 modelViewMatrix;
+                uniform mat4 projectionMatrix;
+                varying vec4 vColor;
+                void main(void) {
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(coordinates, 1.0);
+                    vColor = color;
+                }`;
+
+            var vertShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertShader, vertCode);
+            gl.compileShader(vertShader);
+
+            // Create fragment shader
+            var fragCode = `
+                precision mediump float;
+                varying vec4 vColor;
+                void main(void) {
+                    gl_FragColor = vColor;
+                }`;
+
+            var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragShader, fragCode);
+            gl.compileShader(fragShader);
+
+            // Create shader program
+            shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertShader);
+            gl.attachShader(shaderProgram, fragShader);
+            gl.linkProgram(shaderProgram);
+            gl.useProgram(shaderProgram);
+
+            // Link vertex buffer to shader program
+            var coord = gl.getAttribLocation(shaderProgram, 'coordinates');
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+            gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(coord);
+
+            // Link color buffer to shader program
+            var color = gl.getAttribLocation(shaderProgram, 'color');
+            gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+            gl.vertexAttribPointer(color, 4, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(color);
+
+            // Enable depth test
+            gl.enable(gl.DEPTH_TEST);
+
+            // Start rendering loop
+            requestAnimationFrame(render);
+        };
+
+        function render() {
+            // Clear canvas
+            gl.clearColor(0.9, 0.9, 0.9, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+            // Set perspective matrix
+            var projectionMatrix = mat4.create();
+            mat4.perspective(projectionMatrix, 45 * Math.PI / 180, 1, 0.1, 100);
+
+            // Set model-view matrix
+            var modelViewMatrix = mat4.create();
+            mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -5]);
+            mat4.rotateX(modelViewMatrix, modelViewMatrix, angleX);
+            mat4.rotateY(modelViewMatrix, modelViewMatrix, angleY);
+            mat4.rotateZ(modelViewMatrix, modelViewMatrix, angleZ);
+
+            // Pass matrices to shaders
+            var projectionMatrixLoc = gl.getUniformLocation(shaderProgram, 'projectionMatrix');
+            gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
+
+            var modelViewMatrixLoc = gl.getUniformLocation(shaderProgram, 'modelViewMatrix');
+            gl.uniformMatrix4fv(modelViewMatrixLoc, false, modelViewMatrix);
+
+            // Draw cube
+            gl.drawArrays(gl.TRIANGLES, 0, 36);
+
+            // Update rotation angles for automatic rotation
+            angleX += Math.PI / 360;
+            angleY += Math.PI / 360;
+            angleZ += Math.PI / 360;
+
+            // Render loop
+            requestAnimationFrame(render);
+        }
+
+        function rotateX() {
+            angleX += Math.PI / 180;
+        }
+
+        function rotateY() {
+            angleY += Math.PI / 180;
+        }
+
+        function rotateZ() {
+            angleZ += Math.PI / 180;
+        }
+    </script>
+</body>
+</html>
