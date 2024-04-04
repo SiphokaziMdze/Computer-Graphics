@@ -4,7 +4,8 @@ const gl = canvas.getContext(`webgl`);
 gl.clearColor(0.3, 0.1, 0.7, 1);
 gl.clear(gl.COLOR_BUFFER_BIT);
 
-const vertices = new Float32Array([0.4,0.6, 1,0.6, 1,0.2, 0.85,0.2, 0.85,-0.45, 1,-0.45, 1,-0.85, 0.25,-0.85, 0.25,-0.45, 0.4,0.05, 0,-0.6]);
+const vertices = new Float32Array([0.4,0.6, 1,0.6, 1,0.2, 0.85,0.2, 0.85,-0.45, 1,-0.45, 1,-0.85, 0.25,-0.85, 0.25,-0.45, 0.4,-0.45, 0.4,0.05, 0,-0.6,
+     -0.4,-0.05, -0.25,-0.45, -0.4,-0.45, -0.25,-0.85, -1,-0.85, -1,-0.45, -0.85,-0.45, -0.85,0.2, -1,0.2, -1,0.6, -0.4,0.6]);
 
 const buffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -33,4 +34,4 @@ const position = gl.getAttribLocation(program, `pos`);
 gl.enableVertexAttribArray(position);
 gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
-gl.drawArrays(gl.LINE_LOOP, 0, 22);
+gl.drawArrays(gl.LINE_LOOP, 0, 26);
