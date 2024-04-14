@@ -11,7 +11,10 @@ gl.clear(gl.COLOR_BUFFER_BIT);
 const vertices = new Float32Array([0,0.5, 0.2,0, -0.2,0, 
     -0.4,0.9, -0.2,0.4, -0.6,0.4, 
     0.2,0.4, 0.4,0.9, 0.6,0.4,
-
+    -0.4,-0.4, -0.6,-0.9, -0.2,-0.9,
+    0.4,-0.4, 0.2,-0.9, 0.6,-0.9,
+    -0.9,-0.3, -0.7,0.2, -0.5,-0.3,
+    0.9,-0.3, 0.7,0.2, 0.5,-0.3,
 ]);
 
 const buffer = gl.createBuffer();
@@ -49,4 +52,4 @@ const position = gl.getAttribLocation(program, `pos`);
 gl.enableVertexAttribArray(position);
 gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
-gl.drawArrays(gl.TRIANGLES, 0, 9);
+gl.drawArrays(gl.TRIANGLES, 0, 24);
