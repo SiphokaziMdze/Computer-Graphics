@@ -1,0 +1,10 @@
+body{
+    text-align: center;
+    background-color: blueviolet;
+}
+
+canvas{
+    background-color: rgb(109, 47, 109);
+    box-shadow: 10px 0px 45px;
+    margin-top: 10px;
+}
