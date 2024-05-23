@@ -4,13 +4,55 @@ const webgl = canvas.getContext(`webgl`);
 webgl.clearColor(0.5, 0.2, 0.7, 1);
 webgl.clear(webgl.COLOR_BUFFER_BIT);
 
-const vertices = new Float32Array([
-    0.5, -0.5, 0
+const linesVertices = new Float32Array([
+    0, 0, 0, -0.85, 0.35, 0,
+    0, 0, 0, -0.45, 0.7, 0,
+    0, 0, 0, 0.1, 0.9, 0,
+    0, 0, 0,  0.6, 0.7, 0,
+    0, 0, 0,  0.85, 0.35, 0,
+
+
+    -0.85, 0.35, 0,  -0.45, 0.7, 0,
+    -0.45, 0.7, 0,  0.1, 0.9, 0, 
+    0.1, 0.9, 0, 0.6, 0.7, 0,
+    0.6, 0.7, 0,  0.85, 0.35, 0,
+
+]);
+
+const triangleVertices = new Float32Array([
+    0, 0, 0, 
+    -0.85, 0.35, 0,
+    -0.45, 0.7, 0,
+
+    0, 0, 0,
+    -0.45, 0.7, 0,
+    0.1, 0.9, 0,
+
+    0, 0, 0,
+    0.1, 0.9, 0,
+    0.6, 0.7, 0,
+
+    0, 0, 0,
+    0.6, 0.7, 0,
+    0.85, 0.35, 0,
+    
+]);
+
+const pointsVertices = new Float32Array([
+    0, 0, 0,
+    -0.85, 0.35, 0,
+    -0.45, 0.7, 0,
+    0.1, 0.9, 0,
+    0.6, 0.7, 0,
+    0.85, 0.35, 0,
+
 ]);
 
 const buffer = webgl.createBuffer();
 webgl.bindBuffer(webgl.ARRAY_BUFFER, buffer);
-webgl.bufferData(webgl.ARRAY_BUFFER, vertices, webgl.STATIC_DRAW);
+webgl.bufferData(webgl.ARRAY_BUFFER, pointsVertices, webgl.STATIC_DRAW);
+webgl.bufferData(webgl.ARRAY_BUFFER, linesVertices, webgl.STATIC_DRAW);
+webgl.bufferData(webgl.ARRAY_BUFFER, triangleVertices, webgl.STATIC_DRAW);
 
 const vsSource = `
                   attribute vec3 pos;
@@ -59,9 +101,9 @@ animate();
 
 function animate(){
 
-    webgl.drawArrays(webgl.TRIANGLES, 0, 9);
-    webgl.drawArrays(webgl.POINTS, 0, 6);
-    webgl.drawArrays(webgl.LINES, 0, 9);
+    webgl.drawArrays(webgl.TRIANGLES, 0, 15);
+    webgl.drawArrays(webgl.POINTS, 0, 12);
+    webgl.drawArrays(webgl.LINES, 0, 30);
 
     window.requestAnimationFrame(animate);
 }
