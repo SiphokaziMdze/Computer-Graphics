@@ -59,8 +59,10 @@ const vsSource = `
                   attribute vec3 color;
                   varying vec3 vColor;
 
+                  uniform mat4 matrix;
+
                   void main(){
-                    gl_Position = vec4(pos, 1);
+                    gl_Position = matrix * vec4(pos, 1);
                     vColor = color;
                     gl_PointSize = 10.0;
                   }
@@ -97,9 +99,27 @@ const colorPosition = webgl.getAttribLocation(program, `color`);
 webgl.enableVertexAttribArray(colorPosition);
 webgl.vertexAttribPointer(colorPosition, 3, webgl.FLOAT, false, 0, 0);
 
-animate();
 
+
+const uniformLocations = {
+    matrix: webgl.getUniformLocation(program, `matrix`)
+}
+
+const matrix = glMatrix.mat4.create();
+const projMatrix= glMatrix.mat4.create();
+
+
+glMatrix.mat4.perspective(projMatrix, 75*Math.PI/180, canvas.width/canvas.height ,1e-4, 1e4);
+
+animate();
 function animate(){
+
+   
+    glMatrix.mat4.rotateZ(matrix, matrix, Math.PI/2 /80);
+    glMatrix.mat4.rotateY(matrix, matrix, Math.PI/2 /80);
+    glMatrix.mat4.rotateX(matrix, matrix, Math.PI/2 /80);
+
+    webgl.uniformMatrix4fv(uniformLocations.matrix, false, matrix);
 
     webgl.drawArrays(webgl.TRIANGLES, 0, 15);
     webgl.drawArrays(webgl.POINTS, 0, 12);
