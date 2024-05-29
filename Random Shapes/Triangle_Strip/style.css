@@ -1,0 +1,15 @@
+body{
+    text-align: center;
+    background-image: URL(IFMETriangleStrip.png);
+}
+
+h1{
+    font-size: 40px;
+    color: rgb(0, 0, 0);
+    background-color: aqua;
+}
+
+canvas{
+    box-shadow: 20px 2px 50px;
+    background-color: white;
+}
