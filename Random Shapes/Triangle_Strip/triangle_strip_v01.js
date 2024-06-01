@@ -5,15 +5,31 @@ webgl.clearColor(0.9, 0.9, 0.9, 1);
 webgl.clear(webgl.COLOR_BUFFER_BIT);
 
 const linesVertices = new Float32Array([
+    -0.8, 0.4, 0,  -0.4, -0.4, 0,
+    -0.4, -0.4, 0,   -0.2, 0.4, 0,
+    -0.2, 0.4, 0,    0.2, -0.4, 0,
+    0.2, -0.4, 0,    0.4, 0.4, 0,
+    0.4, 0.4, 0,    0.8, -0.4, 0,
+
+    -0.8, 0.4, 0,   -0.2, 0.4, 0,
+    -0.2, 0.4, 0,  0.4, 0.4, 0,
+    -0.4, -0.4, 0,  0.2, -0.4, 0,
+    0.2, -0.4, 0,  0.8, -0.4, 0,
 
 ]);
 
 const pointsVertices = new Float32Array([
+    -0.8, 0.4, 0,
+    -0.4, -0.4, 0,
+    -0.2, 0.4, 0,
+    0.2, -0.4, 0,
+    0.4, 0.4, 0,
+    0.8, -0.4, 0,
 
 ]);
 
 const trianglesVertices = new Float32Array([
-    -0.6, 0.4, 0,
+    -0.8, 0.4, 0,
     -0.4, -0.4, 0,
     -0.2, 0.4, 0,
 
@@ -21,25 +37,34 @@ const trianglesVertices = new Float32Array([
     -0.4, -0.4, 0,
     0.2, -0.4, 0,
 
-]);
+    0.2, -0.4, 0,
+    -0.2, 0.4, 0,
+    0.4, 0.4, 0,
 
-const colorVertices = new Float32Array([
-    1, 0, 0,
-    1, 0, 0,
-    1, 0, 0,
+    0.4, 0.4, 0,
+    0.2, -0.4, 0,
+    0.8, -0.4, 0
 
-    0, 0, 0,
-    0, 0, 0,
-    0, 0, 0,
 
 ]);
+
+/*const colorVertices = new Float32Array([
+    1, 0, 0,
+    1, 0, 0,
+    1, 0, 0,
+
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0,
+
+]);*/
 
 const buffer = webgl.createBuffer();
 webgl.bindBuffer(webgl.ARRAY_BUFFER, buffer);
-//webgl.bufferData(webgl.ARRAY_BUFFER, linesVertices, webgl.STATIC_DRAW);
+webgl.bufferData(webgl.ARRAY_BUFFER, linesVertices, webgl.STATIC_DRAW);
 //webgl.bufferData(webgl.ARRAY_BUFFER, pointsVertices, webgl.STATIC_DRAW);
-webgl.bufferData(webgl.ARRAY_BUFFER, trianglesVertices, webgl.STATIC_DRAW);
-webgl.bufferData(webgl.ARRAY_BUFFER, colorVertices, webgl.STATIC_DRAW);
+//webgl.bufferData(webgl.ARRAY_BUFFER, trianglesVertices, webgl.STATIC_DRAW);
+//webgl.bufferData(webgl.ARRAY_BUFFER, colorVertices, webgl.STATIC_DRAW);
 
 const vsSource = `
                   attribute vec3 pos;
@@ -92,9 +117,9 @@ function animate() {
     webgl.enable(webgl.DEPTH_TEST);
     webgl.clear(webgl.COLOR_BUFFER_BIT | webgl.DEPTH_BUFFER_BIT);
 
-    webgl.drawArrays(webgl.TRIANGLES, 0, 15);
-    webgl.drawArrays(webgl.LINES, 0, 15);
-    webgl.drawArrays(webgl.POINTS, 0, 15);
+    //webgl.drawArrays(webgl.TRIANGLES, 0, 15);
+    webgl.drawArrays(webgl.LINES, 0, 50);
+    webgl.drawArrays(webgl.POINTS, 0, 12);
 
 
 }
